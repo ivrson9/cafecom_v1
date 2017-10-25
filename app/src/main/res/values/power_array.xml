@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="power">
+        <item>None</item>
+        <item>A few</item>
+        <item>Many</item>
+    </string-array>
+</resources>

@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "817131637607",
+    "project_id": "kaffe-158315"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:817131637607:android:4eeb24adf2408b34",
+        "android_client_info": {
+          "package_name": "com.cdol.cafecom_v1"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "817131637607-ssi7oi9v6sg8afarogkeb3b3ntnjcbat.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.cdol.cafecom_v1",
+            "certificate_hash": "197a1365558299ea076a4c2f63353e05abd255fc"
+          }
+        },
+        {
+          "client_id": "817131637607-e82bfmlr0i3ika9o2mpvmntbshuegb8d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDPgSh5Xc6tMDy01XXTQZi-9DQMf58ZDwA"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

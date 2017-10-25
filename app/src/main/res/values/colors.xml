@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+
+    <color name="brown1">#795548</color>
+    <color name="brown2">#8D6E63</color>
+    <color name="brown3">#9f7160</color>
+
+    <color name="openNow">#00b33c</color>
+    <color name="closed">#ff3333</color>
+
+    <color name="layout_divided">#d9d9d9</color>
+</resources>

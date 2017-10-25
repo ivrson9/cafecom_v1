@@ -1,0 +1,79 @@
+<resources>
+    <string name="app_name">cafecom_v1</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="detail_heading">Web Page Detail</string>
+    <string name="list_heading">Web Page Listing</string>
+
+    <!-- Titlebar -->
+    <string name="search_zip">우편번호 검색</string>
+
+    <!--<string name="url">http://192.168.100.7/cdol/kaffe/</string>-->
+    <!--<string name="url">http://192.168.43.239/cdol/kaffe/</string>-->
+    <string name="url">http://34.208.207.59/cdol/kaffe/</string>
+
+    <!-- API Key -->
+    <string name="google_maps_key">AIzaSyDOLnS0g9WrcodhykS2Fu8GldeKC0vqbDU</string>
+    <string name="facebook_app_id">1420996024637857</string>
+
+    <!-- drawer Menu -->
+    <string name="viewList">목록 보기</string>
+    <string name="viewMap">지도로 보기</string>
+    <string name="viewBookmark">북마크</string>
+    <string name="addCafe">카페 추가</string>
+    <string name="logout">로그아웃</string>
+
+    <!--Cafe 테이블 명-->
+    <string name="itemNo">no</string>
+    <string name="itemName">name</string>
+    <string name="itemAddress">address</string>
+    <string name="itemLatitude">latitude</string>
+    <string name="itemLongitude">longitude</string>
+    <string name="itemOpeningHours">opening_hours</string>
+    <string name="itemRating">rating</string>
+    <string name="itemWifi">wifi</string>
+    <string name="itemPower">power</string>
+    <string name="itemOpenNow">open_now</string>
+
+    <!-- comment 테이블 명 -->
+    <string name="commentNo">comment_no</string>
+    <string name="commentName">name</string>
+    <string name="comment">comment</string>
+    <string name="userRating">rating</string>
+    <string name="commentDate">comment_date</string>
+    <string name="cafeNo">cafe_no</string>
+    <string name="userPhoto">photo</string>
+
+    <!-- CafeView openNow -->
+    <string name="open">영업중</string>
+    <string name="close">영업종료</string>
+
+    <!-- CafeView -->
+    <string name="commentCancelBtn">취소</string>
+    <string name="commentSubmitBtn">등록</string>
+    <string name="addComment">댓글 추가</string>
+
+    <!-- None Fragment -->
+    <string name="noneText">누르셈</string>
+    <string name="noneBtn">재검색</string>
+
+    <!-- ProgressDialog -->
+    <string name="loading">불러오는 중...</string>
+
+    <!-- google login -->
+    <string name="signed_out">signed_out</string>
+    <string name="signed_in_fmt">LoginTest</string>
+    <string name="title_activity_add_cafe">AddCafeActivity</string>
+
+    <!-- Day -->
+    <string name="Monday">월요일</string>
+    <string name="Tuesday">화요일</string>
+    <string name="Wednesday">수요일</string>
+    <string name="Thursday">목요일</string>
+    <string name="Friday">금요일</string>
+    <string name="Saturday">토요일</string>
+    <string name="Sunday">일요일</string>
+
+</resources>

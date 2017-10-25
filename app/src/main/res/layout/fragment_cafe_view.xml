@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:baselineAligned="false">
+
+        <!-- Hide -->
+        <TextView
+            android:id="@+id/cafeLatlng"
+            android:layout_width="match_parent"
+            android:layout_height="21dp"
+            android:visibility="gone"
+            android:text="TextView"/>
+
+        <TextView
+            android:id="@+id/cafeName"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:padding="5dip"
+            android:text="TextView"
+            android:textSize="25sp"
+            android:textColor="#333333"/>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="5dip" >
+            <!--style="?android:attr/ratingBarStyleIndicator"-->
+            <RatingBar
+                android:id="@+id/cafeRating"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:isIndicator="true"
+                android:stepSize="0.5"
+                android:numStars="5"
+                style="@style/CustomRatingBar21"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="5dip">
+
+            <TextView
+                android:id="@+id/opening_hour"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:padding="5dip"
+                android:text="TextView"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/open_now"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:padding="5dip"
+                android:text="TextView"
+                android:textSize="15sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingBottom="10dp">
+            <TextView
+                android:id="@+id/wifiText"
+                android:layout_width="0px"
+                android:layout_height="20dp"
+                android:layout_weight="1"
+                android:text="Wifi:"
+                android:textSize="11sp" />
+            <TextView
+                android:id="@+id/cafeWifi"
+                android:layout_width="0px"
+                android:layout_height="20dp"
+                android:layout_weight="3"
+                android:text="TextView"
+                android:textSize="12sp" />
+
+            <View
+                android:layout_width="1dip"
+                android:layout_height="30dip"
+                android:layout_gravity="center"
+                android:background="@color/layout_divided" />
+
+            <TextView
+                android:id="@+id/powerText"
+                android:layout_width="0px"
+                android:layout_height="20dp"
+                android:layout_weight="1.5"
+                android:paddingLeft="10dp"
+                android:text="Power:"
+                android:textSize="11sp" />
+            <TextView
+                android:id="@+id/cafePower"
+                android:layout_width="0px"
+                android:layout_height="20dp"
+                android:layout_weight="2.5"
+                android:text="TextView"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <View
+                android:layout_width="350dp"
+                android:layout_height="1dip"
+                android:layout_gravity="center"
+                android:background="@color/layout_divided" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="120px"
+            android:padding="10dp">
+
+            <ImageButton
+                android:id="@+id/cafeShare"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:src="@mipmap/ic_share_30"
+                android:background="@null"/>
+
+            <View
+                android:layout_width="1dip"
+                android:layout_height="20dip"
+                android:layout_gravity="center"
+                android:background="@color/layout_divided" />
+
+            <ImageButton
+                android:id="@+id/cafeBookmark"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:src="@mipmap/ic_bookmark_30"
+                android:background="@null"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:orientation="vertical"
+            android:background="@color/layout_divided"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <com.google.android.gms.maps.MapView
+                android:id="@+id/mapView"
+                android:layout_width="match_parent"
+                android:layout_height="200dp" />
+
+            <TextView
+                android:id="@+id/cafeAddress"
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:text="TextView"
+                android:textSize="15sp"
+                android:textAlignment="center"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:orientation="vertical"
+            android:background="@color/layout_divided"/>
+
+        <TextView
+            android:id="@+id/cafe_comment_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:text="@string/addComment"
+            android:textColor="#000000"
+            android:textSize="18dp"
+            android:padding="20px"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:orientation="vertical"
+            android:background="@color/layout_divided"/>
+
+        <ListView android:id="@+id/commentList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:orientation="vertical"
+            android:background="@color/layout_divided"/>
+
+    </LinearLayout>
+</ScrollView>

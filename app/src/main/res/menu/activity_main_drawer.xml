@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_viewList"
+            android:title="@string/viewList" />
+        <item
+            android:id="@+id/nav_viewMap"
+            android:title="@string/viewMap" />
+        <item
+            android:id="@+id/nav_bookmark"
+            android:title="@string/viewBookmark" />
+        <item
+            android:id="@+id/nav_addCafe"
+            android:title="@string/addCafe" />
+        <item
+            android:id="@+id/nav_logOut"
+            android:title="@string/logout"
+            android:visible="true"/>
+    </group>
+
+    <item android:title="Communicate">
+        <menu>
+            <item
+                android:id="@+id/nav_share"
+                android:icon="@drawable/ic_menu_share"
+                android:title="Share" />
+            <item
+                android:id="@+id/nav_send"
+                android:icon="@drawable/ic_menu_send"
+                android:title="Send" />
+        </menu>
+    </item>
+
+</menu>
