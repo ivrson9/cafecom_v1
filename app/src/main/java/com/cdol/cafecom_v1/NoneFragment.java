@@ -49,7 +49,7 @@ public class NoneFragment extends Fragment {
                 ft.remove((((MainActivity)getActivity())).fragmentManager.findFragmentByTag("NoneFragment"));
                 ft.commit();
                 ((MainActivity)getActivity()).fragmentManager.popBackStack();
-                (((MainActivity)getActivity())).mainFragment();
+                (((MainActivity)getActivity())).mainFragment("");
             }
         });
 

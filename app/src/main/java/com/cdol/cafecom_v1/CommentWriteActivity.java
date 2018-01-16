@@ -28,6 +28,7 @@ import java.net.URL;
 public class CommentWriteActivity extends Activity {
 
     private String uri;
+    private CafeViewFragment fragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,27 +42,39 @@ public class CommentWriteActivity extends Activity {
 
         Intent intent = getIntent();
         final int cafeNo = intent.getExtras().getInt("cafeNo");
+        // 0:add, 1:edit
+        final int fn = intent.getExtras().getInt("fn");
         final TextView id = (TextView) findViewById(R.id.comment_id);
         final EditText com = (EditText) findViewById(R.id.comment_text);
         final RatingBar rate = (RatingBar) findViewById(R.id.cafeRating);
         SharedPreferences auto = getSharedPreferences("auto", Activity.MODE_PRIVATE);
+        final String email = auto.getString("inputEmail", "");
         Button submit = (Button) findViewById(R.id.comment_submit_btn);
         Button cancel = (Button) findViewById(R.id.comment_cancel_btn);
 
         id.setText(auto.getString("inputName", ""));
+        if(fn == 1){
+            com.setText(intent.getExtras().getString("comment"));
+            rate.setRating(intent.getExtras().getFloat("rating"));
+        }
         uri = getString(R.string.url);
 
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String commentId = id.getText().toString();
+                String commentId = email;
                 String comment = com.getText().toString();
                 float rating = rate.getRating();
 
-                addComment(uri, cafeNo, commentId, comment, rating);
+                addComment(uri, cafeNo, fn, commentId, comment, rating);
 
-                Intent in = new Intent(CommentWriteActivity.this, MainActivity.class);
-                startActivity(in);
+                Intent returnIntent = new Intent();
+                //returnIntent.putExtra("result",result); // 반환값
+                setResult(Activity.RESULT_OK,returnIntent);
+                finish();
+
+//                Intent in = new Intent(CommentWriteActivity.this, MainActivity.class);
+//                startActivity(in);
             }
         });
 
@@ -73,7 +86,7 @@ public class CommentWriteActivity extends Activity {
         });
     }
 
-    public void addComment(String url, final int no, final String id, final String comment, final float rating) {
+    public void addComment(String url, final int no, final int fn, final String id, final String comment, final float rating) {
         class AddData extends AsyncTask<String, String, String> {
             @Override
             protected void onCancelled() {
@@ -85,7 +98,11 @@ public class CommentWriteActivity extends Activity {
                 String uri = params[0];
 
                 // location insert (get)
-                uri += "getData?fn=comA";
+                if(fn == 0){
+                    uri += "getData?fn=comA";
+                } else if (fn == 1){
+                    uri += "getData?fn=comM";
+                }
                 uri += "&no=" + String.valueOf(no);
                 uri += "&id=" + id;
                 uri += "&comment=" + comment;

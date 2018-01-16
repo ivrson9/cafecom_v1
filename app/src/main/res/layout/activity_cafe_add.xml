@@ -57,8 +57,20 @@
             android:inputType="number"
             android:layout_marginLeft="10dp"
             android:hint="Num"
-            android:imeOptions="actionDone"/>
+            android:imeOptions="actionDone"
+            android:nextFocusDown="@+id/addCafeZipcode"/>
     </LinearLayout>
+
+    <EditText
+        android:id="@+id/addCafeZipcode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="number"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="15dp"
+        android:hint="Zipcode"
+        android:nextFocusDown="@+id/addCity"/>
 
     <Spinner
         android:id="@+id/addCity"
@@ -108,6 +120,14 @@
             android:entries="@array/power" />
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="10dp"
+        android:paddingLeft="10dp"
+        android:text="@string/addExplanation" />
+
     <Button
         android:id="@+id/addCafeSubmit"
         android:layout_width="94dp"
@@ -117,5 +137,6 @@
         android:layout_marginTop="30dp"
         android:layout_marginRight="20dp"
         android:layout_gravity="right"/>
+
 
 </LinearLayout>

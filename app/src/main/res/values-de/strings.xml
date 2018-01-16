@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">cafecom_v1</string>
+    <string name="app_name">CaféCom</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -7,20 +7,22 @@
     <string name="detail_heading">Web Page Detail</string>
     <string name="list_heading">Web Page Listing</string>
 
-    <!-- Titlebar -->
+    <!-- Tool bar -->
+    <string name="addCafeToolbar">Café hinzufügen</string>
     <string name="search_zip">Search Zipcode</string>
 
     <!--<string name="url">http://192.168.100.7/cdol/kaffe/</string>-->
     <!--<string name="url">http://192.168.43.239/cdol/kaffe/</string>-->
-    <string name="url">http://34.208.207.59/cdol/kaffe/</string>
+    <string name="url">http://93.202.233.68/cdol/kaffe/</string>
 
     <!-- API Key -->
     <string name="google_maps_key">AIzaSyDOLnS0g9WrcodhykS2Fu8GldeKC0vqbDU</string>
     <string name="facebook_app_id">1420996024637857</string>
+    <string name="banner_ad_unit_id">ca-app-pub-3679734076579105/5071958971</string>
 
     <!-- drawer Menu -->
-    <string name="viewList">View List</string>
-    <string name="viewMap">Overview Map</string>
+    <string name="viewList">Liste anzeigen</string>
+    <string name="viewMap">Übersichtskarte</string>
     <string name="viewBookmark">Bookmark</string>
     <string name="addCafe">Add Cafe</string>
     <string name="logout">Logout</string>
@@ -39,6 +41,7 @@
 
     <!-- comment 테이블 명 -->
     <string name="commentNo">comment_no</string>
+    <string name="commentEmail">email</string>
     <string name="commentName">name</string>
     <string name="comment">comment</string>
     <string name="userRating">rating</string>
@@ -46,21 +49,42 @@
     <string name="cafeNo">cafe_no</string>
     <string name="userPhoto">photo</string>
 
-    <!-- CafeView openNow -->
+    <!-- Common -->
+    <string name="cancel">Zurück</string>
+    <string name="submit">Weiter</string>
+    <string name="confirm">Bestätigung</string>
+    <string name="loading">Laden...</string>
+
+    <!-- CafeView Fragment -->
     <string name="open">Öffnen</string>
     <string name="close">geschloß</string>
-
-    <!-- CafeView -->
-    <string name="commentCancelBtn">Zurück</string>
-    <string name="commentSubmitBtn">Weiter</string>
+    <string name="openingHours">Öffnungszeiten</string>
     <string name="addComment">Kommentar schreiben</string>
+    <string name="featuresFree">Kostenlos</string>
+    <string name="featuresRestricted">Beschränkt</string>
+    <string name="featuresPay">Bezahlt</string>
+    <string name="featuresNone">Keiner</string>
+    <string name="featuresMany">Viel</string>
+    <string name="featuresFew">Wenige</string>
+    <string name="sharing">Teilen</string>
+    <string name="needLogin">Bitte loggen Sie sich</string>
+    <string name="copyAddress">"Adresse" id die Zwischenablage kopiert.</string>
+
+    <!-- CommentListView Adapter -->
+    <string name="delComment">Möchten Sie diesen Kommentar löschen?</string>
 
     <!-- None Fragment -->
     <string name="noneText">Press</string>
     <string name="noneBtn">Wiederholung</string>
 
-    <!-- ProgressDialog -->
-    <string name="loading">Laden...</string>
+    <!-- Login Activity -->
+    <string name="alreadyGoogle">Sie sind bereits bei Google angemeldet.</string>
+    <string name="alreadyFacebook">Sie sind bereits bei Facebook angemeldet.</string>
+
+    <!-- Main Activity -->
+    <string name="closeApp">Closing</string>
+    <string name="closeAppComment">Möchten Sie %1$s wirklich schließen?</string>
+    <string name="logoutComment">Möchten Sie sich wirklich abmelden?</string>
 
     <!-- google login -->
     <string name="signed_out">signed_out</string>
@@ -75,5 +99,14 @@
     <string name="Friday">Freitag</string>
     <string name="Saturday">Samstag</string>
     <string name="Sunday">Sonntag</string>
+    <string name="closed">Geschlossen</string>
+
+    <!-- CafeAdd Activity-->
+    <string name="addCafeName">Bitte gib Café-Name an.</string>
+    <string name="addCafeStreet">Bitte gib der Straßenname an.</string>
+    <string name="addCafeNumber">Bitte gib die Hausnummer an.</string>
+    <string name="addCafeZipcode">Bitte gib die Postleitzahl an.</string>
+    <string name="addExplanation">* Es wird vom Administrator nach der Registrierung überprüft und reflektiert.</string>
+    <string name="addCompleted">Hinzugefügt.</string>
 
 </resources>

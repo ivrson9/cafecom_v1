@@ -1,6 +1,7 @@
 package com.cdol.cafecom_v1;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,33 +30,29 @@ public class CafeListViewAdapter extends BaseAdapter {
     // position에 위치한 데이터를 화면에 출력하는데 사용될 View를 리턴. : 필수 구현
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        final int pos = position;
         final Context context = parent.getContext();
+        ViewHolder viewHolder;
 
         // "listview_item" Layout을 inflate하여 convertView 참조 획득.
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.cafe_list_item, parent, false);
+            viewHolder = new ViewHolder(convertView);
+            convertView.setTag(viewHolder);
+        } else {
+            viewHolder = (ViewHolder) convertView.getTag();
         }
-
-        // 화면에 표시될 View(Layout이 inflate된)으로부터 위젯에 대한 참조 획득
-        TextView titleTextView = (TextView) convertView.findViewById(R.id.id) ;
-        TextView addressTextView = (TextView) convertView.findViewById(R.id.name) ;
-        TextView distanceTextView = (TextView) convertView.findViewById(R.id.distance) ;
-        RatingBar ratingRatingBar = (RatingBar) convertView.findViewById(R.id.rate);
-        ImageView isBookmarkImage = (ImageView) convertView.findViewById(R.id.is_bookmark) ;
 
         // Data Set(listViewItemList)에서 position에 위치한 데이터 참조 획득
         CafeListViewItem listViewItem = cafeListViewItemList.get(position);
 
         // 아이템 내 각 위젯에 데이터 반영
-        titleTextView.setText(listViewItem.getTitle());
-        addressTextView.setText(listViewItem.getAddressStr());
-        distanceTextView.setText(listViewItem.getDistance());
-        ratingRatingBar.setRating(listViewItem.getRatingFloat());
-        if(listViewItem.isBookmark()) {
-            isBookmarkImage.setVisibility(View.VISIBLE);
-        }
+        viewHolder.titleTextView.setText(listViewItem.getTitle());
+        viewHolder.addressTextView.setText(listViewItem.getAddressStr());
+        viewHolder.distanceTextView.setText(listViewItem.getDistance());
+        viewHolder.ratingRatingBar.setRating(listViewItem.getRatingFloat());
+        viewHolder.isBookmarkImage.setVisibility(listViewItem.getBookmarkVisibility());
+
         return convertView;
     }
 
@@ -79,9 +76,27 @@ public class CafeListViewAdapter extends BaseAdapter {
         item.setAddressStr(address);
         item.setRatingFloat(rating);
         item.setDistance(distance);
-        item.setBookmark(isBookmark);
+        item.setBookmarkVisibility(isBookmark);
 
         cafeListViewItemList.add(item);
+    }
+
+    private static class ViewHolder {
+        // 화면에 표시될 View(Layout이 inflate된)으로부터 위젯에 대한 참조 획득
+        TextView titleTextView;
+        TextView addressTextView;
+        TextView distanceTextView;
+        RatingBar ratingRatingBar;
+        ImageView isBookmarkImage;
+
+        public ViewHolder(View view) {
+            // 화면에 표시될 View(Layout이 inflate된)으로부터 위젯에 대한 참조 획득
+            titleTextView = (TextView) view.findViewById(R.id.id) ;
+            addressTextView = (TextView) view.findViewById(R.id.name) ;
+            distanceTextView = (TextView) view.findViewById(R.id.distance) ;
+            ratingRatingBar = (RatingBar) view.findViewById(R.id.rate);
+            isBookmarkImage = (ImageView) view.findViewById(R.id.is_bookmark) ;
+        }
     }
 }
 

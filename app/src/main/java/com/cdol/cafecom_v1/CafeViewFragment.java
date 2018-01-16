@@ -2,6 +2,8 @@ package com.cdol.cafecom_v1;
 
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -58,6 +60,7 @@ public class CafeViewFragment extends Fragment {
     private ImageView bookmark_add;
     private int dayofweek;
     private OpenHour today;
+    private SharedPreferences session;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -73,6 +76,8 @@ public class CafeViewFragment extends Fragment {
         commentList = new ArrayList();
         listView = (ListView) getView().findViewById(R.id.commentList);
         int cafeNo = cafe.getNo();
+
+        session = ((MainActivity)getActivity()).auto;
 
         uri = getActivity().getString(R.string.url);
         getData(uri, cafeNo, "comment");
@@ -160,11 +165,11 @@ public class CafeViewFragment extends Fragment {
 
                         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(view.getContext());
 
-                        alertDialogBuilder.setTitle("영업시간");
+                        alertDialogBuilder.setTitle(R.string.openingHours);
                         alertDialogBuilder.setView(layout);
 
                         // AlertDialog 셋팅
-                        alertDialogBuilder.setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                        alertDialogBuilder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                             public void onClick(
                                     DialogInterface dialog, int id) {
                                 // 다이얼로그를 취소한다
@@ -192,6 +197,11 @@ public class CafeViewFragment extends Fragment {
                 int openTime = Integer.parseInt(today.getOpen_time());
                 int closeTime = Integer.parseInt(today.getClose_time());
 
+                // 새벽 0 ~ 6시 사이에 종료 할 경우
+                if(closeTime >= 0 && closeTime <= 600){
+                    closeTime += 2400;
+                }
+
                 if(current >= openTime && current <= closeTime){
                     open_now.setText(R.string.open);
                     open_now.setTextColor(ContextCompat.getColor(getActivity(), R.color.openNow));
@@ -208,16 +218,16 @@ public class CafeViewFragment extends Fragment {
 
             // Features
             switch (cafe.getWifi()){
-                case 3: wifi.setText("Free"); break;
-                case 2: wifi.setText("Restricted"); break;
-                case 1: wifi.setText("Not Free"); break;
-                case 0: wifi.setText("None"); break;
+                case 3: wifi.setText(R.string.featuresFree); break;
+                case 2: wifi.setText(R.string.featuresRestricted); break;
+                case 1: wifi.setText(R.string.featuresPay); break;
+                case 0: wifi.setText(R.string.featuresNone); break;
             }
 
             switch (cafe.getPower()){
-                case 2: power.setText("Many"); break;
-                case 1: power.setText("A few"); break;
-                case 0: power.setText("None"); break;
+                case 2: power.setText(R.string.featuresMany); break;
+                case 1: power.setText(R.string.featuresFew); break;
+                case 0: power.setText(R.string.featuresNone); break;
             }
 
             cafe_share.setOnClickListener(new View.OnClickListener() {
@@ -229,23 +239,69 @@ public class CafeViewFragment extends Fragment {
                     shareIntent.putExtra(Intent.EXTRA_TEXT, cafe.getAddress());
                     shareIntent.putExtra(Intent.EXTRA_TITLE, R.string.app_name);
                     shareIntent.setType("text/plain");
-                    startActivity(Intent.createChooser(shareIntent, "공유"));
+
+                    String sharing = getString(R.string.sharing);
+                    startActivity(Intent.createChooser(shareIntent, sharing));
                 }
             });
 
+            // Bookmark
             changeBookmarkImg(cafe.isBookmark());
             bookmark_add.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    getData(uri, cafe.getNo(), "bookmark");
+                    if(session.getString("inputEmail", "").equals("")){
+                        AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
+                        alert.setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();     //닫기
+                            }
+                        });
+                        alert.setMessage(R.string.needLogin);
+                        alert.show();
+                    } else {
+                        getData(uri, cafe.getNo(), "bookmark");
+                    }
                 }
             });
+
+            // Write Comment
             comment_write.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent intent = new Intent(getActivity(), CommentWriteActivity.class);
-                    intent.putExtra("cafeNo", cafe.getNo());
-                    startActivity(intent);
+                    AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
+                    alert.setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();     //닫기
+                        }
+                    });
+
+                    int i = 0;
+                    for (Comment c : commentList){
+                        if(session.getString("inputEmail", "").equals("")){
+                            alert.setMessage(R.string.needLogin);
+                            alert.show();
+                            break;
+                        }
+                        if(c.getEmail().equals(session.getString("inputEmail",""))){
+                            Intent intent = new Intent(getActivity(), CommentWriteActivity.class);
+                            intent.putExtra("cafeNo", cafe.getNo());
+                            intent.putExtra("fn", 1);
+                            intent.putExtra("comment", c.getComment());
+                            intent.putExtra("rating", c.getRating());
+                            getActivity().startActivityForResult(intent,1);
+                            break;
+                        }
+                        i++;
+                    }
+                    if(i == commentList.size()){
+                        Intent intent = new Intent(getActivity(), CommentWriteActivity.class);
+                        intent.putExtra("cafeNo", cafe.getNo());
+                        intent.putExtra("fn", 0);
+                        getActivity().startActivityForResult(intent,1);
+                    }
                 }
             });
         }
@@ -268,7 +324,7 @@ public class CafeViewFragment extends Fragment {
 
                 UiSettings uiSettings = googleMap.getUiSettings();
                 uiSettings.setScrollGesturesEnabled(false); // 맵 이동 불가
-                uiSettings.setZoomGesturesEnabled(false);   // 맵 확대 불가
+                uiSettings.setZoomGesturesEnabled(true);   // 맵 확대 불가
 
                 LatLng cafeLatlng = new LatLng(cafe.getLatitude(), cafe.getLongitude());
                 googleMap.addMarker(new MarkerOptions().position(cafeLatlng));
@@ -277,7 +333,20 @@ public class CafeViewFragment extends Fragment {
                 googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
                     @Override
                     public void onMapClick(LatLng latLng) {
-                        Toast.makeText(getActivity(), "Toast!!", Toast.LENGTH_LONG).show();
+                        String latLngStr =  (String.valueOf(cafe.getLatitude())+","+String.valueOf(cafe.getLongitude()));
+                        Bundle bundle = new Bundle(1); // 파라미터는 전달할 데이터 개수
+                        bundle.putString("latLngStr", latLngStr); // key , value
+                        ((MainActivity)getActivity()).doFragmentTransaction("MapFragment", bundle);
+                    }
+                });
+                googleMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+                    @Override
+                    public void onMapLongClick(LatLng latLng) {
+                        ClipboardManager clipboardManager = (ClipboardManager)getActivity().getSystemService(getActivity().CLIPBOARD_SERVICE);
+                        ClipData clipData = ClipData.newPlainText("label", cafe.getAddress());
+                        clipboardManager.setPrimaryClip(clipData);
+
+                        Toast.makeText(getActivity(), R.string.copyAddress, Toast.LENGTH_LONG).show();
                     }
                 });
             }
@@ -300,9 +369,9 @@ public class CafeViewFragment extends Fragment {
     private void displayListView() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-        commentListAdapter = new CommentListViewAdapter();
+        commentListAdapter = new CommentListViewAdapter(this);
         for (Comment c : commentList) {
-            commentListAdapter.addItem(c.getPhoto(), c.getNo(), c.getName(), c.getComment(), dateFormat.format(c.getComment_date()), c.getRateing());
+            commentListAdapter.addItem(c.getPhoto(), c.getNo(), c.getEmail(), c.getName(), c.getComment(), dateFormat.format(c.getComment_date()), c.getRating());
         }
 
         listView.setAdapter(commentListAdapter);
@@ -325,6 +394,7 @@ public class CafeViewFragment extends Fragment {
     }
 
     protected void displayNoneList(){
+        //listView.setEmptyView(getView().findViewById(android.R.id.empty));
         NoneListViewAdapter noneListViewAdapter = new NoneListViewAdapter();
         noneListViewAdapter.addItem("None Comment");
 
@@ -358,7 +428,10 @@ public class CafeViewFragment extends Fragment {
                 } else if(fn == "bookmark"){
                     uri = uri + "getData?fn=userBA";
                     uri = uri + "&no=" + String.valueOf(cafeNo);
-                    uri = uri + "&email=" + ((MainActivity)getActivity()).auto.getString("inputEmail", "");
+                    uri = uri + "&email=" + session.getString("inputEmail", "");
+                } else if(fn == "commentD"){
+                    uri += "getData?fn=comD";
+                    uri += "&commentNo=" + String.valueOf(cafeNo);
                 }
                 Log.v("URL", uri);
                 BufferedReader bufferedReader = null;
@@ -397,9 +470,10 @@ public class CafeViewFragment extends Fragment {
                                     Comment comment = new Comment();
 
                                     comment.setNo(c.getInt((String) getText(R.string.commentNo)));
+                                    comment.setEmail(c.getString((String)getText(R.string.commentEmail)));
                                     comment.setName(c.getString((String) getText(R.string.commentName)));
                                     comment.setComment(c.getString((String) getText(R.string.comment)));
-                                    comment.setRateing((float) c.getDouble((String) getText(R.string.userRating)));
+                                    comment.setRating((float) c.getDouble((String) getText(R.string.userRating)));
                                     comment.setComment_date(dateFormat.parse(c.getString((String) getText(R.string.commentDate))));
                                     comment.setPhoto(c.getString((String) getText(R.string.userPhoto)));
 
@@ -415,8 +489,13 @@ public class CafeViewFragment extends Fragment {
                     } else if (fn == "bookmark") {
                         try {
                             JSONObject c = new JSONObject(result);
-                            String list_string = ((MainActivity)getActivity()).auto.getString("bookmark", "");
-                            ArrayList<String> list = new ArrayList(Arrays.asList(list_string.split(",")));
+                            String list_string = session.getString("bookmark", "");
+                            ArrayList<String> list;
+                            if(list_string.equals("")){
+                                list = new ArrayList();
+                            } else {
+                                list = new ArrayList(Arrays.asList(list_string.split(",")));
+                            }
 
                             if(c.getString("result").equals("Already")){
                                 changeBookmarkImg(false);
@@ -428,13 +507,16 @@ public class CafeViewFragment extends Fragment {
                                 Toast.makeText(getActivity(), "Bookmark Add", Toast.LENGTH_LONG).show();
                             }
 
-                            SharedPreferences.Editor edit = ((MainActivity)getActivity()).auto.edit();
+                            SharedPreferences.Editor edit = session.edit();
                             edit.putString("bookmark",
-                                    list.size()==1 ? list.toString() : android.text.TextUtils.join(",", list)); // ArrayList to String
+                                    list.size()==1 ? list.get(0) : android.text.TextUtils.join(",", list)); // ArrayList to String
                             edit.commit();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
+                    } else if (fn == "commentD"){
+                        commentListAdapter.notifyDataSetChanged();
+                        listView.setAdapter(commentListAdapter);
                     }
                 }
             }

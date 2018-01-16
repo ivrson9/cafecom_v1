@@ -64,19 +64,19 @@
         android:orientation="horizontal"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="1">
+        android:layout_weight="1.5">
         <ImageView
             android:id="@+id/is_bookmark"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:visibility="gone"
+            android:visibility="invisible"
             android:src="@mipmap/ic_bookmark_red_30"/>
         <TextView
             android:id="@+id/distance"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="2"
+            android:layout_weight="3"
             android:padding="5dip"
             android:gravity="right"
             android:text="New Text"

@@ -8,11 +8,12 @@ import java.util.Date;
 
 public class Comment {
     private int no = 0;
+    private String email = "";
     private String name = "";
     private String comment = "";
     private Date comment_date = null;
     private String photo = "";
-    private float rateing = 0;
+    private float rating = 0;
 
     public int getNo() {
         return no;
@@ -20,6 +21,14 @@ public class Comment {
 
     public void setNo(int no) {
         this.no = no;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getName() {
@@ -54,11 +63,11 @@ public class Comment {
         this.photo = photo;
     }
 
-    public float getRateing() {
-        return rateing;
+    public float getRating() {
+        return rating;
     }
 
-    public void setRateing(float rateing) {
-        this.rateing = rateing;
+    public void setRating(float rating) {
+        this.rating = rating;
     }
 }

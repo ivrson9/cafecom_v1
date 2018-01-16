@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">cafecom_v1</string>
+    <string name="app_name">CaféCom</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -7,16 +7,18 @@
     <string name="detail_heading">Web Page Detail</string>
     <string name="list_heading">Web Page Listing</string>
 
-    <!-- Titlebar -->
+    <!-- Tool bar -->
+    <string name="addCafeToolbar">Café 추가</string>
     <string name="search_zip">우편번호 검색</string>
 
     <!--<string name="url">http://192.168.100.7/cdol/kaffe/</string>-->
     <!--<string name="url">http://192.168.43.239/cdol/kaffe/</string>-->
-    <string name="url">http://34.208.207.59/cdol/kaffe/</string>
+    <string name="url">http://93.202.233.68/cdol/kaffe/</string>
 
     <!-- API Key -->
     <string name="google_maps_key">AIzaSyDOLnS0g9WrcodhykS2Fu8GldeKC0vqbDU</string>
     <string name="facebook_app_id">1420996024637857</string>
+    <string name="banner_ad_unit_id">ca-app-pub-3679734076579105/5071958971</string>
 
     <!-- drawer Menu -->
     <string name="viewList">목록 보기</string>
@@ -39,6 +41,7 @@
 
     <!-- comment 테이블 명 -->
     <string name="commentNo">comment_no</string>
+    <string name="commentEmail">email</string>
     <string name="commentName">name</string>
     <string name="comment">comment</string>
     <string name="userRating">rating</string>
@@ -46,21 +49,42 @@
     <string name="cafeNo">cafe_no</string>
     <string name="userPhoto">photo</string>
 
-    <!-- CafeView openNow -->
+    <!-- Common -->
+    <string name="cancel">취소</string>
+    <string name="submit">등록</string>
+    <string name="confirm">확인</string>
+    <string name="loading">불러오는 중...</string>
+
+    <!-- CafeView Fragment -->
     <string name="open">영업중</string>
     <string name="close">영업종료</string>
-
-    <!-- CafeView -->
-    <string name="commentCancelBtn">취소</string>
-    <string name="commentSubmitBtn">등록</string>
+    <string name="openingHours">영업시간</string>
     <string name="addComment">댓글 추가</string>
+    <string name="featuresFree">무료</string>
+    <string name="featuresRestricted">제한적</string>
+    <string name="featuresPay">유로</string>
+    <string name="featuresNone">없음</string>
+    <string name="featuresMany">많음</string>
+    <string name="featuresFew">적음</string>
+    <string name="sharing">공유</string>
+    <string name="needLogin">로그인 후 사용가능합니다.</string>
+    <string name="copyAddress">"주소"가 클립보드에 복사되었습니다.</string>
+
+    <!-- CommentListView Adapter -->
+    <string name="delComment">댓글을 지우시겠습니까?</string>
 
     <!-- None Fragment -->
     <string name="noneText">누르셈</string>
     <string name="noneBtn">재검색</string>
 
-    <!-- ProgressDialog -->
-    <string name="loading">불러오는 중...</string>
+    <!-- Login Activity -->
+    <string name="alreadyGoogle">이미 Google ID로 가입되어있습니다.</string>
+    <string name="alreadyFacebook">이미 Facebook ID로 가입되어있습니다.</string>
+
+    <!-- Main Activity -->
+    <string name="closeApp">종료</string>
+    <string name="closeAppComment">%1$s을 종료 하시겠습니까?</string>
+    <string name="logoutComment">로그아웃 하시겠습니까?</string>
 
     <!-- google login -->
     <string name="signed_out">signed_out</string>
@@ -75,5 +99,14 @@
     <string name="Friday">금요일</string>
     <string name="Saturday">토요일</string>
     <string name="Sunday">일요일</string>
+    <string name="closed">휴무</string>
+
+    <!-- CafeAdd Activity-->
+    <string name="addCafeName">카페 이름을 입력해 주세요.</string>
+    <string name="addCafeStreet">거리명을 입력해 주세요.</string>
+    <string name="addCafeNumber">거리번호를 입력해 주세요.</string>
+    <string name="addCafeZipcode">우편번호를 입력해 주세요.</string>
+    <string name="addExplanation">* 등록 후 관리자가 검토 하여 반영 됩니다.</string>
+    <string name="addCompleted">추가되었습니다.</string>
 
 </resources>

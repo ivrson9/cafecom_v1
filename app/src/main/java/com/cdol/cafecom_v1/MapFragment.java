@@ -11,6 +11,8 @@ import android.graphics.Canvas;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.widget.SearchView;
+import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
@@ -55,9 +58,9 @@ public class MapFragment extends Fragment {
     private GoogleMap googleMap;
     private MyLocation myLocation;
     private ArrayList<Cafe> cafeList;
-    private View marker_root_view;
     private String uri;
     private ProgressDialog mProgressDialog;
+    private LatLng searchLatLng;
     private static final String TAG_RESULTS="result";
 
     public MapFragment(MyLocation location) {
@@ -79,7 +82,7 @@ public class MapFragment extends Fragment {
         cafeList = new ArrayList();
 
         uri = getActivity().getString(R.string.url);
-        getData(uri);
+        getData(uri, "cafeL", "");
     }
 
     @Override
@@ -108,49 +111,97 @@ public class MapFragment extends Fragment {
         mMapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(GoogleMap mMap) {
-            googleMap = mMap;
+                googleMap = mMap;
+                String latLngStr = "";
+                LatLng getLatLng = null;
 
-            // For showing a move to my location button
-            if (ActivityCompat.checkSelfPermission(getActivity(),
-                    android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                    && ActivityCompat.checkSelfPermission(getActivity(),
-                    android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            } else {
-                ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 0);
-                ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION}, 0);
-            }
-            googleMap.setMyLocationEnabled(true);
+                try{
+                    latLngStr = getArguments().getString("latLngStr");
+                    String[] latLngTmp =  (latLngStr).split(",");
+                    getLatLng = new LatLng(Double.parseDouble(latLngTmp[0]), Double.parseDouble(latLngTmp[1]));
 
-            googleMap.setInfoWindowAdapter(new MyInfoWindowAdapter());
-
-            LatLng myLatlng = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
-
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myLatlng, 16));
-
-            googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
-                @Override
-                public void onInfoWindowClick(Marker marker) {
-                    CafeViewFragment cafeViewFragment = new CafeViewFragment();
-                    cafeViewFragment.setCafeContent((Cafe) marker.getTag());
-                    FragmentTransaction ft = getFragmentManager().beginTransaction();
-                    ft.hide(((MainActivity)getActivity()).fragmentManager.findFragmentByTag("MapFragment"));
-                    ft.add(R.id.mainFragment, cafeViewFragment, "CafeViewFragment");
-                    ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-                    ft.addToBackStack(null);
-                    ft.commit();
+                }catch (Exception e){
+                    ;
                 }
-            });
+
+
+
+                // For showing a move to my location button
+                if (ActivityCompat.checkSelfPermission(getActivity(),
+                        android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                        && ActivityCompat.checkSelfPermission(getActivity(),
+                        android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                } else {
+                    ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 0);
+                    ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION}, 0);
+                }
+                googleMap.setMyLocationEnabled(true);
+
+                googleMap.setInfoWindowAdapter(new MyInfoWindowAdapter());
+
+                LatLng myLatlng = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
+
+                if(!latLngStr.equals("")){
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(getLatLng, 16));
+                } else {
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myLatlng, 16));
+                }
+
+                googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                    @Override
+                    public boolean onMarkerClick(Marker marker) {
+                        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(), 16), 500, null);
+                        marker.showInfoWindow();
+                        return true;
+                    }
+                });
+
+                googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+                    @Override
+                    public void onInfoWindowClick(Marker marker) {
+                        CafeViewFragment cafeViewFragment = new CafeViewFragment();
+                        cafeViewFragment.setCafeContent((Cafe) marker.getTag());
+                        FragmentTransaction ft = getFragmentManager().beginTransaction();
+                        ft.hide(((MainActivity)getActivity()).fragmentManager.findFragmentByTag("MapFragment"));
+                        ft.add(R.id.mainFragment, cafeViewFragment, "CafeViewFragment");
+                        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+                        ft.addToBackStack(null);
+                        ft.commit();
+                    }
+                });
             }
         });
 
         return view;
     }
 
+
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         menu.clear();
         inflater.inflate(R.menu.map, menu);
         super.onCreateOptionsMenu(menu, inflater);
+
+        SearchView mapSearchView = (SearchView) menu.findItem(R.id.map_search).getActionView();
+        mapSearchView.setInputType(InputType.TYPE_CLASS_NUMBER);
+        mapSearchView.setQueryHint(getString(R.string.search_zip));
+        mapSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                getData(uri, "googleGeo", s);
+
+                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(searchLatLng, 15), 500, null);
+
+                InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
+
+                return true;
+            }
+            @Override
+            public boolean onQueryTextChange(String s) {
+                return false;
+            }
+        });
     }
 
     @Override
@@ -211,7 +262,7 @@ public class MapFragment extends Fragment {
         return bitmap;
     }
 
-    public void getData(String url) {
+    public void getData(String url, final String fn, final String searchTxt) {
         class GetDataJSON extends AsyncTask<String, String, String> {
             @Override
             protected void onPreExecute() {
@@ -223,9 +274,14 @@ public class MapFragment extends Fragment {
                 String uri = params[0];
 
                 // location insert (get)
-                uri = uri + "getData?fn=cafeL";
-                uri = uri + "&lat=" + myLocation.getLatitude();
-                uri = uri + "&lng=" + myLocation.getLongitude();
+                if(fn.equals("cafeL")) {
+                    uri = uri + "getData?fn=cafeL";
+                    uri = uri + "&lat=" + myLocation.getLatitude();
+                    uri = uri + "&lng=" + myLocation.getLongitude();
+                } else if (fn.equals("googleGeo")){
+                    uri = uri + "getData?fn=googleGeo";
+                    uri = uri + "&address=" + searchTxt;
+                }
                 Log.v("URL", uri);
                 BufferedReader bufferedReader = null;
                 try {
@@ -252,31 +308,45 @@ public class MapFragment extends Fragment {
             protected void onPostExecute(String result) {
                 hideProgressDialog();
                 if (result != null) {
-                    if(isAdded()) {
-                        try {
-                            JSONArray cafeJson = new JSONObject(result).getJSONArray(TAG_RESULTS);
+                    if(fn.equals("cafeL")) {
+                        if (isAdded()) {
+                            try {
+                                JSONArray cafeJson = new JSONObject(result).getJSONArray(TAG_RESULTS);
 
-                            for (int i = 0; i < cafeJson.length(); i++) {
-                                JSONObject c = cafeJson.getJSONObject(i);
-                                Cafe cafe = new Cafe();
+                                for (int i = 0; i < cafeJson.length(); i++) {
+                                    JSONObject c = cafeJson.getJSONObject(i);
+                                    Cafe cafe = new Cafe();
 
-                                cafe.setNo(c.getInt((String) getText(R.string.itemNo)));
-                                cafe.setName(c.getString((String) getText(R.string.itemName)));
-                                cafe.setAddress(c.getString((String) getText(R.string.itemAddress)));
-                                cafe.setLatitude(Double.parseDouble(c.getString((String) getText(R.string.itemLatitude))));
-                                cafe.setLongitude(Double.parseDouble(c.getString((String) getText(R.string.itemLongitude))));
-                                cafe.setOpening_hours(c.getString((String) getText(R.string.itemOpeningHours)));
-                                cafe.setWifi(c.getInt((String) getText(R.string.itemWifi)));
-                                cafe.setPower(c.getInt((String) getText(R.string.itemPower)));
+                                    cafe.setNo(c.getInt((String) getText(R.string.itemNo)));
+                                    cafe.setName(c.getString((String) getText(R.string.itemName)));
+                                    cafe.setAddress(c.getString((String) getText(R.string.itemAddress)));
+                                    cafe.setLatitude(Double.parseDouble(c.getString((String) getText(R.string.itemLatitude))));
+                                    cafe.setLongitude(Double.parseDouble(c.getString((String) getText(R.string.itemLongitude))));
+                                    cafe.setOpening_hours(c.getString((String) getText(R.string.itemOpeningHours)));
+                                    cafe.setWifi(c.getInt((String) getText(R.string.itemWifi)));
+                                    cafe.setPower(c.getInt((String) getText(R.string.itemPower)));
 
-                                if(c.getInt((String) getText(R.string.itemRating)) == 10){
-                                    cafe.setRating(0);
-                                } else {
-                                    cafe.setRating(c.getInt((String) getText(R.string.itemRating)));
+                                    if (c.getInt((String) getText(R.string.itemRating)) == 10) {
+                                        cafe.setRating(0);
+                                    } else {
+                                        cafe.setRating(c.getInt((String) getText(R.string.itemRating)));
+                                    }
+
+                                    cafeList.add(cafe);
                                 }
 
-                                cafeList.add(cafe);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
                             }
+                        }
+                    } else if (fn.equals("googleGeo")){
+                        try {
+                            JSONArray geoJson = new JSONObject(result).getJSONArray(TAG_RESULTS);
+                            JSONObject geo = geoJson.getJSONObject(0);
+                            double lat = Double.parseDouble(geo.getJSONObject("geometry").getJSONObject("location").getString("lat"));
+                            double lng = Double.parseDouble(geo.getJSONObject("geometry").getJSONObject("location").getString("lng"));
+
+                            searchLatLng = new LatLng(lat, lng);
 
                         } catch (JSONException e) {
                             e.printStackTrace();

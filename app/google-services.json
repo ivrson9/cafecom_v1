@@ -1,7 +1,9 @@
 {
   "project_info": {
     "project_number": "817131637607",
-    "project_id": "kaffe-158315"
+    "firebase_url": "https://kaffe-158315.firebaseio.com",
+    "project_id": "kaffe-158315",
+    "storage_bucket": "kaffe-158315.appspot.com"
   },
   "client": [
     {
@@ -13,12 +15,16 @@
       },
       "oauth_client": [
         {
-          "client_id": "817131637607-ssi7oi9v6sg8afarogkeb3b3ntnjcbat.apps.googleusercontent.com",
+          "client_id": "817131637607-n66as5mr7bgpv7hp72ahapg0lgv5louf.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.cdol.cafecom_v1",
-            "certificate_hash": "197a1365558299ea076a4c2f63353e05abd255fc"
+            "certificate_hash": "ffb6d81074308d9d39caeb5621e3f97ab531b1c9"
           }
+        },
+        {
+          "client_id": "817131637607-apetj78qeqdur6hfnpmmr887shjnn0jq.apps.googleusercontent.com",
+          "client_type": 3
         },
         {
           "client_id": "817131637607-e82bfmlr0i3ika9o2mpvmntbshuegb8d.apps.googleusercontent.com",
@@ -27,7 +33,7 @@
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDPgSh5Xc6tMDy01XXTQZi-9DQMf58ZDwA"
+          "current_key": "AIzaSyBMBl5H7lXDcVjyFdqRg4lxXTQoyQTS_0k"
         }
       ],
       "services": {
@@ -35,11 +41,16 @@
           "status": 1
         },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "817131637607-apetj78qeqdur6hfnpmmr887shjnn0jq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         },
         "ads_service": {
-          "status": 1
+          "status": 2
         }
       }
     }

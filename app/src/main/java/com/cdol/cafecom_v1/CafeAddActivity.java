@@ -28,35 +28,39 @@ public class CafeAddActivity extends AppCompatActivity {
         setContentView(R.layout.activity_cafe_add);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        setTitle(R.string.addCafeToolbar);
 
         final EditText name = (EditText) findViewById(R.id.addCafeName);
         final EditText street = (EditText) findViewById(R.id.addCafeStreet);
         final EditText streetNum = (EditText) findViewById(R.id.addCafeStreetNum);
+        final EditText zipcode = (EditText) findViewById(R.id.addCafeZipcode);
         final Spinner city = (Spinner) findViewById(R.id.addCity);
-        final Spinner wifi = (Spinner) findViewById(R.id.addCity);
-        final Spinner power = (Spinner) findViewById(R.id.addCity);
+        final Spinner wifi = (Spinner) findViewById(R.id.addCafeWifi);
+        final Spinner power = (Spinner) findViewById(R.id.addCafePower);
         Button submit = (Button) findViewById(R.id.addCafeSubmit);
 
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(name.getText().toString().equals("")){
-                    Toast.makeText(CafeAddActivity.this, "Name", Toast.LENGTH_LONG).show();
+                    Toast.makeText(CafeAddActivity.this, R.string.addCafeName, Toast.LENGTH_LONG).show();
                 } else if (street.getText().toString().equals("")){
-                    Toast.makeText(CafeAddActivity.this, "Street", Toast.LENGTH_LONG).show();
+                    Toast.makeText(CafeAddActivity.this, R.string.addCafeStreet, Toast.LENGTH_LONG).show();
                 } else if (streetNum.getText().toString().equals("")){
-                    Toast.makeText(CafeAddActivity.this, "Street Number", Toast.LENGTH_LONG).show();
+                    Toast.makeText(CafeAddActivity.this, R.string.addCafeNumber, Toast.LENGTH_LONG).show();
+                } else if (zipcode.getText().toString().equals("")){
+                    Toast.makeText(CafeAddActivity.this, R.string.addCafeZipcode, Toast.LENGTH_LONG).show();
                 } else {
                     AddCafe cafe = new AddCafe();
                     cafe.setName(name.getText().toString());
                     cafe.setStreet(street.getText().toString());
                     cafe.setStreetNum(Integer.parseInt(streetNum.getText().toString()));
+                    cafe.setZipcode(Integer.parseInt(zipcode.getText().toString()));
                     cafe.setCity(city.getSelectedItem().toString());
                     cafe.setWifi(wifi.getSelectedItemPosition());
                     cafe.setPower(power.getSelectedItemPosition());
 
-                    cafe.setAddress(cafe.getStreet() + " " + cafe.getStreetNum() + ", " + cafe.getCity());
+                    cafe.setAddress(cafe.getStreet() + " " + cafe.getStreetNum() + ", " + cafe.getZipcode() + " " + cafe.getCity());
 
                     addCafeList(getString(R.string.url), cafe.getName(), cafe.getAddress(), cafe.getWifi(), cafe.getPower());
                 }
@@ -109,7 +113,7 @@ public class CafeAddActivity extends AppCompatActivity {
             @Override
             protected void onPostExecute(String result) {
                 hideProgressDialog();
-                Toast.makeText(CafeAddActivity.this, "Add ok", Toast.LENGTH_LONG).show();
+                Toast.makeText(CafeAddActivity.this, R.string.addCompleted, Toast.LENGTH_LONG).show();
             }
         }
         AddData a = new AddData();

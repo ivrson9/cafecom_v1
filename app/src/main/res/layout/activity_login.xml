@@ -11,6 +11,7 @@
         android:layout_height="40dp"
         android:visibility="visible"
         android:layout_above="@+id/sign_in_facebook_btn"
+
         android:layout_marginBottom="16dp"
         android:layout_alignStart="@+id/sign_in_facebook_btn"
         android:layout_alignEnd="@+id/sign_in_facebook_btn" />
@@ -18,10 +19,10 @@
     <com.facebook.login.widget.LoginButton
         android:id="@+id/sign_in_facebook_btn"
         android:layout_width="wrap_content"
-        android:layout_height="40dp"
-        android:visibility="visible"
-        android:layout_marginBottom="50dp"
+        android:layout_height="50dp"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="50dp"
+        android:visibility="visible" />
 
 </RelativeLayout>

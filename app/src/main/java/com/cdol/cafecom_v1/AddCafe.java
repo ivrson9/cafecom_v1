@@ -9,6 +9,7 @@ public class AddCafe {
     String address = "";
     String street = "";
     int streetNum = 0;
+    int zipcode = 0;
     String city = "";
     int wifi = 0;
     int power = 0;
@@ -43,6 +44,14 @@ public class AddCafe {
 
     public void setStreetNum(int streetNum) {
         this.streetNum = streetNum;
+    }
+
+    public int getZipcode() {
+        return zipcode;
+    }
+
+    public void setZipcode(int zipcode) {
+        this.zipcode = zipcode;
     }
 
     public String getCity() {

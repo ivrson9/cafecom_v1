@@ -45,7 +45,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Arrays;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity_firebase extends AppCompatActivity {
 
     private static final String TAG = "LoginActivity";
     private static final int RC_SIGN_IN = 9001;
@@ -242,12 +242,7 @@ public class LoginActivity extends AppCompatActivity {
         autoLogin.putString("inputEmail", email);
         autoLogin.putString("inputName", name);
         autoLogin.putString("inputPhoto", userPhoto);
-        if(bookmark.equals("null")){
-            autoLogin.putString("bookmark", "");
-        } else {
-            autoLogin.putString("bookmark", bookmark);
-        }
-
+        autoLogin.putString("bookmark", bookmark);
 
         autoLogin.commit();
 
@@ -321,19 +316,18 @@ public class LoginActivity extends AppCompatActivity {
                 if(result != null) {
                     try {
                         JSONObject resultObject = new JSONObject(result);
-
+                        Log.v("??", resultObject.getString("bookmark"));
                         // 0: 다른채널 중복 Email, 1: Login, 2:SignIn
                         if(resultObject.getInt("result") == 0){
                             String message = "";
                             if(resultObject.getInt("value") == 1){
-                                message = getApplicationContext().getString(R.string.alreadyGoogle);
+                                message = "이미 Google로 가입되어있습니다.";
                             } else if(resultObject.getInt("value") == 2){
-                                message = getApplicationContext().getString(R.string.alreadyFacebook);
+                                message = "이미 Facebook으로 가입되어있습니다.";
                             }
-                            Toast.makeText(LoginActivity.this, message, Toast.LENGTH_LONG).show();
+                            Toast.makeText(LoginActivity_firebase.this, message, Toast.LENGTH_LONG).show();
                         } else {
                             setSharedPreferences(user.getId(), user.getEmail(), user.getName(), user.getPhoto(), resultObject.getString("bookmark"));
-                            hideProgressDialog();
                             onStart();
                         }
                     } catch (JSONException e) {

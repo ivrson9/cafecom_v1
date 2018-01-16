@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 
 import com.baoyz.widget.PullRefreshLayout;
@@ -44,12 +45,14 @@ public class CafeListFragment extends Fragment {
     CafeListViewAdapter cafeListAdapter;
     ArrayAdapter noneAdapter;
     private MyLocation myLocation;
+    private String searchText;
     private ArrayList<Cafe> cafeList;
     private String uri;
     private static final String TAG_RESULTS="result";
 
-    public CafeListFragment(MyLocation location) {
+    public CafeListFragment(MyLocation location, String search) {
         myLocation = location;
+        searchText = search;
     }
 
     @Override
@@ -66,17 +69,30 @@ public class CafeListFragment extends Fragment {
 
         swipeRefreshLayout = (PullRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
         cafeList = new ArrayList();
-        listView = (ListView) getView().findViewById(R.id.cafeList);
+        listView = (ListView) getView().findViewById(android.R.id.list);
+        // empty List
+        //listView.setEmptyView(getView().findViewById(android.R.id.empty));
 
         uri = getActivity().getString(R.string.url);
         getData(uri);
 
+        // 당겨서 리스트 새로고침
         swipeRefreshLayout.setOnRefreshListener(new PullRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                cafeList = new ArrayList();
                 getData(uri);
             }
         });
+
+//        Button listRefresh = (Button) getView().findViewById(R.id.list_refresh);
+//        listRefresh.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                onResume();
+//            }
+//        });
+
     }
 
     @Override
@@ -96,7 +112,7 @@ public class CafeListFragment extends Fragment {
 
     // Container Activity must implement this interface
     public interface OnItemListener {
-        public void onItemSelected(Cafe c, int fn);
+        void onItemSelected(Cafe c, int fn);
     }
 
     @Override
@@ -133,7 +149,7 @@ public class CafeListFragment extends Fragment {
 
         listView.setAdapter(cafeListAdapter);
         //enables filtering for the contents of the given ListView
-        listView.setTextFilterEnabled(true);
+        //listView.setTextFilterEnabled(true);
 
         listView.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view,
@@ -145,12 +161,6 @@ public class CafeListFragment extends Fragment {
             }
         });
 
-    }
-
-    protected void displayNoneList(){
-        noneAdapter = new ArrayAdapter(getActivity(), R.layout.nonelist_item) ;
-
-        listView.setAdapter(noneAdapter) ;
     }
 
     // 거리재기
@@ -199,6 +209,9 @@ public class CafeListFragment extends Fragment {
                 uri = uri + "getData?fn=cafeL";
                 uri = uri + "&lat=" + myLocation.getLatitude();
                 uri = uri + "&lng=" + myLocation.getLongitude();
+                if(!searchText.equals("")){
+                    uri = uri + "&zip=" + searchText;
+                }
                 Log.d("URL", uri);
 
                 try {
@@ -216,7 +229,6 @@ public class CafeListFragment extends Fragment {
                                 sb.append(json+"\n");
                             }
 
-                            Log.d("!!!", sb.toString());
                             br.close();
                         }
                         conn.disconnect();
@@ -231,55 +243,51 @@ public class CafeListFragment extends Fragment {
             @Override
             protected void onPostExecute(String result) {
                 ((MainActivity)getActivity()).hideProgressDialog();
-                if ((myLocation.getLatitude() == 0 && myLocation.getLongitude() == 0) || result == null) {
-                    displayNoneList();
-                } else {
-                    if(isAdded()) {
-                        try {
-                            JSONArray cafeJson = new JSONObject(result).getJSONArray(TAG_RESULTS);
-                            String list_string = ((MainActivity)getActivity()).auto.getString("bookmark", "");
+                if(isAdded()) {
+                    try {
+                        JSONArray cafeJson = new JSONObject(result).getJSONArray(TAG_RESULTS);
+                        String list_string = ((MainActivity)getActivity()).auto.getString("bookmark", "");
 
-                            for (int i = 0; i < cafeJson.length(); i++) {
-                                JSONObject c = cafeJson.getJSONObject(i);
-                                Cafe cafe = new Cafe();
+                        for (int i = 0; i < cafeJson.length(); i++) {
+                            JSONObject c = cafeJson.getJSONObject(i);
+                            Cafe cafe = new Cafe();
 
-                                cafe.setNo(c.getInt((String) getText(R.string.itemNo)));
-                                cafe.setName(c.getString((String) getText(R.string.itemName)));
-                                cafe.setAddress(c.getString((String) getText(R.string.itemAddress)));
-                                cafe.setLatitude(Double.parseDouble(c.getString((String) getText(R.string.itemLatitude))));
-                                cafe.setLongitude(Double.parseDouble(c.getString((String) getText(R.string.itemLongitude))));
-                                cafe.setOpening_hours(c.getString((String) getText(R.string.itemOpeningHours)));
-                                cafe.setWifi(c.getInt((String) getText(R.string.itemWifi)));
-                                cafe.setPower(c.getInt((String) getText(R.string.itemPower)));
+                            cafe.setNo(c.getInt((String) getText(R.string.itemNo)));
+                            cafe.setName(c.getString((String) getText(R.string.itemName)));
+                            cafe.setAddress(c.getString((String) getText(R.string.itemAddress)));
+                            cafe.setLatitude(Double.parseDouble(c.getString((String) getText(R.string.itemLatitude))));
+                            cafe.setLongitude(Double.parseDouble(c.getString((String) getText(R.string.itemLongitude))));
+                            cafe.setOpening_hours(c.getString((String) getText(R.string.itemOpeningHours)));
+                            cafe.setWifi(c.getInt((String) getText(R.string.itemWifi)));
+                            cafe.setPower(c.getInt((String) getText(R.string.itemPower)));
 
-                                // Set isBookmark
-                                if(!list_string.equals("")) {
-                                    ArrayList<String> list = new ArrayList(Arrays.asList(list_string.split(",")));
-                                    for (int j = 0; j < list.size(); j++) {
-                                        if (cafe.getNo() == Integer.parseInt(list.get(j))) {
-                                            cafe.setIsBookmark(true);
-                                        }
+                            // Set isBookmark
+                            if(!list_string.equals("")) {
+                                ArrayList<String> list = new ArrayList(Arrays.asList(list_string.split(",")));
+                                for (int j = 0; j < list.size(); j++) {
+                                    if (cafe.getNo() == Integer.parseInt(list.get(j))) {
+                                        cafe.setIsBookmark(true);
                                     }
                                 }
-
-                                // Set Rating
-                                if(c.getInt((String) getText(R.string.itemRating)) == 10){
-                                    cafe.setRating(0);
-                                } else {
-                                    cafe.setRating((float)c.getDouble((String) getText(R.string.itemRating)));
-                                }
-
-
-                                cafeList.add(cafe);
                             }
 
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+                            // Set Rating
+                            if(c.getInt((String) getText(R.string.itemRating)) == 10){
+                                cafe.setRating(0);
+                            } else {
+                                cafe.setRating((float)c.getDouble((String) getText(R.string.itemRating)));
+                            }
+
+
+                            cafeList.add(cafe);
                         }
 
-                        displayListView();
-                        swipeRefreshLayout.setRefreshing(false);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
+
+                    displayListView();
+                    swipeRefreshLayout.setRefreshing(false);
                 }
             }
         }

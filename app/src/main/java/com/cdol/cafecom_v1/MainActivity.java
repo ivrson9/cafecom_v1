@@ -1,7 +1,9 @@
 package com.cdol.cafecom_v1;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
@@ -23,24 +25,42 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
+import com.mommoo.permission.MommooPermission;
+import com.mommoo.permission.listener.OnPermissionDenied;
+import com.mommoo.permission.listener.OnPermissionGranted;
+import com.mommoo.permission.listener.OnUserDirectPermissionDeny;
+import com.mommoo.permission.listener.OnUserDirectPermissionGrant;
+import com.mommoo.permission.repository.DenyInfo;
+
+import java.util.List;
 
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, CafeListFragment.OnItemListener, BookmarkFragment.OnItemListener {
+        implements NavigationView.OnNavigationItemSelectedListener, CafeListFragment.OnItemListener, BookmarkFragment.OnItemListener, SearchFragment.OnItemListener {
 
     MyLocation myLocation;
     FragmentManager fragmentManager;
+    CafeListFragment cafeListFragment;
+    MapFragment mapFragment;
+    BookmarkFragment bookmarkFragment;
+    SearchFragment searchFragment;
+    SearchView listSearchView;
     ProgressDialog mProgressDialog;
     SharedPreferences auto;
     User user;
@@ -52,6 +72,45 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        new MommooPermission.Builder(this)
+                .setPermissions(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
+                .setOnUserDirectPermissionGrant(new OnUserDirectPermissionGrant() {
+                    @Override
+                    public void onUserDirectGrant(List<String> permissionList) {
+                        for (String permission : permissionList) System.out.println("userGrant " + permission);
+                    }
+                })
+                .setOnUserDirectPermissionDeny(new OnUserDirectPermissionDeny() {
+                    @Override
+                    public void onUserDirectDeny(List<DenyInfo> deniedPermissionList) {
+                        for (DenyInfo denyInfo : deniedPermissionList){
+                            System.out.println("userDeny " + denyInfo.getPermission() +" , userNeverSeeChecked " + denyInfo.isUserNeverAskAgainChecked());
+                        }
+                    }
+                })
+                .setOnPermissionDenied(new OnPermissionDenied() {
+                    @Override
+                    public void onDenied(List<DenyInfo> deniedPermissionList) {
+                        for (DenyInfo denyInfo : deniedPermissionList){
+                            System.out.println("isDenied " + denyInfo.getPermission() +" , userNeverSeeChecked " + denyInfo.isUserNeverAskAgainChecked());
+                        }
+                    }
+                })
+                .setOnPermissionGranted(new OnPermissionGranted() {
+                    @Override
+                    public void onGranted(List<String> permissionList) {
+                        for (String permission : permissionList) System.out.println("granted " + permission);
+                    }
+                })
+                .setPreNoticeDialogData("Pre Notice","Please accept all permission to using this app")
+                .setPostNoticeDialogData("Post Notice","If you don't accept permission\nyou have to grant permission directly")
+                .setOfferGrantPermissionData("Move To App Setup",
+                        "1. Touch the 'SETUP'\n" +
+                                "2. Touch the 'Permission' tab\n"+
+                                "3. Grant all permissions by dragging toggle button")
+                .build()
+                .checkPermissions();
 
         loadActivity();
     }
@@ -82,6 +141,12 @@ public class MainActivity extends AppCompatActivity
 
         manager = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
         networkInfo = manager.getActiveNetworkInfo();
+
+        // AdMob
+        AdView mAdView = (AdView) findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
+        MobileAds.initialize(getApplicationContext(), getString(R.string.banner_ad_unit_id));
 
         // User Info
         auto = getSharedPreferences("auto", Activity.MODE_PRIVATE);
@@ -123,7 +188,7 @@ public class MainActivity extends AppCompatActivity
 
         myLocation = new MyLocation();
 
-        mainFragment();
+        mainFragment("");
     }
 
     public void loginActivity(){
@@ -134,15 +199,22 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
-        super.onActivityResult(requestCode, resultCode, data);
-
-        for(int i = 0; i < fragmentManager.getBackStackEntryCount(); ++i) {
-            fragmentManager.popBackStack();
+        // commentWriteActivity 종료
+        if(requestCode == 1){
+            Fragment frg = fragmentManager.findFragmentByTag("CafeViewFragment");
+            FragmentTransaction ft = fragmentManager.beginTransaction();
+            ft.detach(frg);
+            ft.attach(frg);
+            ft.commit();
+        } else {
+            for (int i = 0; i < fragmentManager.getBackStackEntryCount(); ++i) {
+                fragmentManager.popBackStack();
+            }
+            loadActivity();
         }
-        loadActivity();
     }
 
-    public void mainFragment(){
+    public void mainFragment(String search){
         fragmentManager = getFragmentManager();
         FragmentTransaction ft = fragmentManager.beginTransaction();
 
@@ -150,8 +222,8 @@ public class MainActivity extends AppCompatActivity
 
         if(myLocation.isAvailable(this) && networkInfo != null && networkInfo.isConnected()){
             myLocation.searchAddress(this);
-            CafeListFragment listFragment = new CafeListFragment(myLocation);
-            ft.add(R.id.mainFragment, listFragment, "MainFragment");
+            cafeListFragment = new CafeListFragment(myLocation, search);
+            ft.add(R.id.mainFragment, cafeListFragment, "MainFragment");
         } else {
             NoneFragment noneFragment = new NoneFragment();
             ft.add(R.id.mainFragment, noneFragment, "NoneFragment");
@@ -163,28 +235,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onItemSelected(Cafe c, int fn) {
-        Log.v("AndroidFragmentActivity", Integer.toString(c.getNo()));
-        FragmentTransaction ft = fragmentManager.beginTransaction();
-        CafeViewFragment cafeViewFragment = new CafeViewFragment();
-        cafeViewFragment.setCafeContent(c);
-
-        if(fn == 0) {
-            ft.hide(fragmentManager.findFragmentByTag("MainFragment"));
-        } else if (fn == 1) {
-            ft.hide(fragmentManager.findFragmentByTag("BookmarkFragment"));
-        }
-
-        ft.add(R.id.mainFragment, cafeViewFragment, "CafeViewFragment");
-        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-        ft.addToBackStack(null);
-        ft.commit();
-
-    }
-
-    @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -192,11 +245,13 @@ public class MainActivity extends AppCompatActivity
                 fragmentManager.popBackStackImmediate();
             } else {
                 //Toast.makeText(this, String.valueOf(fragmentManager.getBackStackEntryCount()), Toast.LENGTH_LONG).show();
+                String closeAppComment = getString(R.string.closeAppComment);
+                String app_name = getString(R.string.app_name);
                 new AlertDialog.Builder(this)
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .setTitle("Closing Activity")
-                        .setMessage("Are you sure you want to close this activity?")
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener()
+//                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setTitle(R.string.closeApp)
+                        .setMessage(String.format(closeAppComment, app_name))
+                        .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener()
                         {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -204,7 +259,7 @@ public class MainActivity extends AppCompatActivity
                             }
 
                         })
-                        .setNegativeButton("No", null)
+                        .setNegativeButton(R.string.cancel, null)
                         .show();
             }
         }
@@ -215,13 +270,23 @@ public class MainActivity extends AppCompatActivity
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
 
-        SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
-        searchView.setQueryHint(getString(R.string.search_zip));
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        listSearchView = (SearchView) menu.findItem(R.id.list_search).getActionView();
+        listSearchView.setInputType(InputType.TYPE_CLASS_NUMBER);
+        listSearchView.setQueryHint(getString(R.string.search_zip));
+        listSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
+                // 키보드 내림 + 포커스 제거
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+                listSearchView.clearFocus();
 
-                return false;
+                if (fragmentManager.findFragmentByTag("SearchFragment") == null) {
+                    Bundle bundle = new Bundle(1); // 파라미터는 전달할 데이터 개수
+                    bundle.putString("searchZip", s); // key , value
+                    doFragmentTransaction("SearchFragment", bundle);
+                }
+                return true;
             }
             @Override
             public boolean onQueryTextChange(String s) {
@@ -242,7 +307,7 @@ public class MainActivity extends AppCompatActivity
         //noinspection SimplifiableIfStatement
         if (id == R.id.nav_google) {
             if(fragmentManager.findFragmentByTag("MapFragment") == null) {
-                doFragmentTransaction("MapFragment");
+                doFragmentTransaction("MapFragment", null);
             }
         }
 
@@ -262,29 +327,62 @@ public class MainActivity extends AppCompatActivity
             }
         } else if (id == R.id.nav_viewMap) {
             if(fragmentManager.findFragmentByTag("MapFragment") == null){
-                doFragmentTransaction("MapFragment");
+                doFragmentTransaction("MapFragment", null);
             }
         } else if( id == R.id.nav_bookmark){
             if (fragmentManager.findFragmentByTag("BookmarkFragment") == null) {
-                doFragmentTransaction("BookmarkFragment");
+                doFragmentTransaction("BookmarkFragment", null);
             }
         } else if (id == R.id.nav_addCafe) {
             Intent intent = new Intent(getBaseContext(), CafeAddActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_logOut) {
-            auto = getSharedPreferences("auto", Activity.MODE_PRIVATE);
-            SharedPreferences.Editor editor = auto.edit();
-            editor.clear();
-            editor.commit();
+            AlertDialog.Builder alert_confirm = new AlertDialog.Builder(this);
+            alert_confirm.setMessage(R.string.logoutComment).setCancelable(false).setPositiveButton(R.string.confirm,
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            auto = getSharedPreferences("auto", Activity.MODE_PRIVATE);
+                            SharedPreferences.Editor editor = auto.edit();
+                            editor.clear();
+                            editor.commit();
 
-            for(int i = 0; i < fragmentManager.getBackStackEntryCount(); ++i) {
-                fragmentManager.popBackStack();
+                            for(int i = 0; i < fragmentManager.getBackStackEntryCount(); ++i) {
+                                fragmentManager.popBackStack();
+                            }
+                            loadActivity();
+                        }
+                    }).setNegativeButton(R.string.cancel,
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // 'No'
+                            return;
+                        }
+                    });
+            AlertDialog alert = alert_confirm.create();
+            alert.show();
+
+        } else if (id == R.id.nav_email_send) {
+            Intent emailIntent = new Intent(Intent.ACTION_SEND);
+
+            try {
+                emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{"ivrson9@gmail.com"});
+
+                emailIntent.setType("text/html");
+                emailIntent.setPackage("com.google.android.gm");
+                if(emailIntent.resolveActivity(getPackageManager())!=null)
+                    startActivity(emailIntent);
+
+                startActivity(emailIntent);
+            } catch (Exception e) {
+                e.printStackTrace();
+
+                emailIntent.setType("text/html");
+                emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{"ivrson9@gmail.com"});
+
+                startActivity(Intent.createChooser(emailIntent, "Send Email"));
             }
-            loadActivity();
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -292,11 +390,34 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    public void doFragmentTransaction(String fragment){
+    @Override
+    public void onItemSelected(Cafe c, int fn) {
+        Log.v("AndroidFragmentActivity", Integer.toString(c.getNo()));
         FragmentTransaction ft = fragmentManager.beginTransaction();
-        CafeListFragment cafeListFragment = (CafeListFragment)getFragmentManager().findFragmentByTag("MainFragment");
-        MapFragment mapFragment = (MapFragment)getFragmentManager().findFragmentByTag("MapFragment");
-        BookmarkFragment bookmarkFragment = (BookmarkFragment)getFragmentManager().findFragmentByTag("BookmarkFragment");
+        CafeViewFragment cafeViewFragment = new CafeViewFragment();
+        cafeViewFragment.setCafeContent(c);
+
+        if(fn == 0) {
+            ft.hide(fragmentManager.findFragmentByTag("MainFragment"));
+        } else if (fn == 1) {
+            ft.hide(fragmentManager.findFragmentByTag("BookmarkFragment"));
+        } else if (fn == 2) {
+            ft.hide(fragmentManager.findFragmentByTag("SearchFragment"));
+        }
+
+        ft.add(R.id.mainFragment, cafeViewFragment, "CafeViewFragment");
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+        ft.addToBackStack(null);
+        ft.commit();
+
+    }
+
+    public void doFragmentTransaction(String fragment, Bundle bundle){
+        FragmentTransaction ft = fragmentManager.beginTransaction();
+        cafeListFragment = (CafeListFragment)getFragmentManager().findFragmentByTag("MainFragment");
+        mapFragment = (MapFragment)getFragmentManager().findFragmentByTag("MapFragment");
+        bookmarkFragment = (BookmarkFragment)getFragmentManager().findFragmentByTag("BookmarkFragment");
+        searchFragment = (SearchFragment)getFragmentManager().findFragmentByTag("SearchFragment");
 
         if(cafeListFragment != null && cafeListFragment.isVisible()){
             ft.hide(fragmentManager.findFragmentByTag("MainFragment"));
@@ -304,17 +425,28 @@ public class MainActivity extends AppCompatActivity
             ft.hide(fragmentManager.findFragmentByTag("MapFragment"));
         } else if(bookmarkFragment != null && bookmarkFragment.isVisible()){
             ft.hide(fragmentManager.findFragmentByTag("BookmarkFragment"));
+        } else if(searchFragment != null && searchFragment.isVisible()){
+            ft.hide(fragmentManager.findFragmentByTag("SearchFragment"));
         }
 
         if(fragment.equals("MapFragment")){
             MapFragment f = new MapFragment(myLocation);
+            f.setArguments(bundle); // bundle set
             ft.add(R.id.mainFragment, f, "MapFragment");
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
             ft.addToBackStack(null);
             ft.commit();
         } else if(fragment.equals("BookmarkFragment")){
             BookmarkFragment f = new BookmarkFragment(myLocation);
+            f.setArguments(bundle); // bundle set
             ft.add(R.id.mainFragment, f, "BookmarkFragment");
+            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+            ft.addToBackStack(null);
+            ft.commit();
+        } else if(fragment.equals("SearchFragment")){
+            SearchFragment f = new SearchFragment(myLocation);
+            f.setArguments(bundle); // bundle set
+            ft.add(R.id.mainFragment, f, "SearchFragment");
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
             ft.addToBackStack(null);
             ft.commit();

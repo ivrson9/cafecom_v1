@@ -82,7 +82,7 @@ public class OpenHour {
 
     public String getFullStr(){
         if(this.isClose){
-            return this.getDayString() + ": 휴무";
+            return this.getDayString() + ": " + R.string.closed;
         } else {
             return this.getDayString() + ": " + this.getOpen_time_str() + " ~ " + this.getClose_time_str();
         }

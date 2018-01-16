@@ -14,6 +14,14 @@
         android:visibility="gone"
         android:text="TextView"/>
 
+    <TextView
+        android:id="@+id/comment_email"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:visibility="gone"
+        android:text="TextView"/>
+    <!-- end Hide -->
+
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="0dp"
@@ -49,9 +57,11 @@
                 android:textColor="#000000"
                 android:textSize="15dp" />
             <ImageView
+                android:id="@+id/comment_del"
                 android:layout_width="0dp"
                 android:layout_height="20dp"
                 android:layout_weight="0.5"
+                android:visibility="gone"
                 app:srcCompat="@mipmap/ic_close_black_36dp"/>
         </LinearLayout>
 

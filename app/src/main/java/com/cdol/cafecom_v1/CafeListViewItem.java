@@ -1,6 +1,7 @@
 package com.cdol.cafecom_v1;
 
 import android.graphics.drawable.Drawable;
+import android.view.View;
 
 public class CafeListViewItem {
     private Drawable iconDrawable ;
@@ -8,7 +9,7 @@ public class CafeListViewItem {
     private String addressStr ;
     private float ratingDouble ;
     private String distanceStr ;
-    private boolean isBookmark = false ;
+    private int bookmarkVisibility;
 
     public void setIcon(Drawable icon) {
         iconDrawable = icon ;
@@ -25,8 +26,12 @@ public class CafeListViewItem {
     public void setDistance(String distance) {
         distanceStr = distance ;
     }
-    public void setBookmark(boolean bookmark) {
-        isBookmark = bookmark;
+    public void setBookmarkVisibility(boolean bookmarkVisibility) {
+        if(bookmarkVisibility) {
+            this.bookmarkVisibility = View.VISIBLE;
+        } else {
+            this.bookmarkVisibility = View.GONE;
+        }
     }
 
     public Drawable getIcon() {
@@ -44,7 +49,7 @@ public class CafeListViewItem {
     public String getDistance() {
         return this.distanceStr ;
     }
-    public boolean isBookmark() {
-        return isBookmark;
+    public int getBookmarkVisibility() {
+        return bookmarkVisibility;
     }
 }

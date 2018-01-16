@@ -3,6 +3,7 @@ package com.cdol.cafecom_v1;
 public class CommentListViewItem {
     private String iconDrawable ;
     private int no;
+    private String emailStr;
     private String nameStr ;
     private String commentStr ;
     private String dateStr ;
@@ -22,6 +23,14 @@ public class CommentListViewItem {
 
     public void setNo(int no) {
         this.no = no;
+    }
+
+    public String getEmailStr() {
+        return emailStr;
+    }
+
+    public void setEmailStr(String emailStr) {
+        this.emailStr = emailStr;
     }
 
     public String getNameStr() {

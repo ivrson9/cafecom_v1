@@ -28,23 +28,23 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
- * Created by cdol on 2017. 4. 2..
+ * Created by cdol on 2018. 1. 15..
  */
 
-public class BookmarkFragment extends Fragment {
+public class SearchFragment extends Fragment {
 
     OnItemListener mListener;
     PullRefreshLayout swipeRefreshLayout;
     ListView listView;
     CafeListViewAdapter cafeListAdapter;
     ArrayAdapter noneAdapter;
-    private String function;
     private MyLocation myLocation;
     private ArrayList<Cafe> cafeList;
     private String uri;
+    private String searchZip;
     private static final String TAG_RESULTS="result";
 
-    public BookmarkFragment(MyLocation location) {
+    public SearchFragment(MyLocation location) {
         myLocation = location;
     }
 
@@ -57,7 +57,7 @@ public class BookmarkFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Log.v("BookmarkFragment", "onActivityCreated().");
+        Log.v("SearchFragment", "onActivityCreated().");
         Log.v("ListsavedInstanceState", savedInstanceState == null ? "true" : "false");
 
         swipeRefreshLayout = (PullRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
@@ -75,21 +75,15 @@ public class BookmarkFragment extends Fragment {
             }
         });
 
-        if(((MainActivity)getActivity()).user.getEmail() == ""){
-            ((MainActivity)getActivity()).loginActivity();
-        }
-
-        String book = ((MainActivity)getActivity()).auto.getString("bookmark", "");
-        if(book != "") {
-            getData(uri);
-        }
+        searchZip = getArguments().getString("searchZip");
+        getData(uri);
 
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Log.v("BookmarkFragment", "onCreateView()");
+        Log.v("SearchFragment", "onCreateView()");
         Log.v("ListContainer", container == null ? "true" : "false");
         Log.v("ListsavedInstanceState", savedInstanceState == null ? "true" : "false");
         if (container == null) {
@@ -131,6 +125,13 @@ public class BookmarkFragment extends Fragment {
         super.onLowMemory();
     }
 
+    @Override
+    public void onStop(){
+        super.onStop();
+        ((MainActivity)getActivity()).listSearchView.setQuery("", false);
+        ((MainActivity)getActivity()).listSearchView.setIconified(true);
+    }
+
     private void displayListView() {
         cafeListAdapter = new CafeListViewAdapter();
         for (Cafe c : cafeList) {
@@ -147,7 +148,7 @@ public class BookmarkFragment extends Fragment {
                                     int position, long id) {
                 // Send the URL to the host activity
                 //mListener.onItemSelected(((TextView) view).getText().toString());
-                mListener.onItemSelected(cafeList.get(position), 1);
+                mListener.onItemSelected(cafeList.get(position), 2);
 
             }
         });
@@ -206,7 +207,7 @@ public class BookmarkFragment extends Fragment {
                 uri = uri + "getData?fn=cafeL";
                 uri = uri + "&lat=" + myLocation.getLatitude();
                 uri = uri + "&lng=" + myLocation.getLongitude();
-                uri = uri + "&bookmark=" + ((MainActivity)getActivity()).auto.getString("bookmark", "");
+                uri = uri + "&zipcode=" + searchZip;
 
                 Log.d("URL", uri);
 
