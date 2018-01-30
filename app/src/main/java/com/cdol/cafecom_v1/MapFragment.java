@@ -60,7 +60,6 @@ public class MapFragment extends Fragment {
     private ArrayList<Cafe> cafeList;
     private String uri;
     private ProgressDialog mProgressDialog;
-    private LatLng searchLatLng;
     private static final String TAG_RESULTS="result";
 
     public MapFragment(MyLocation location) {
@@ -182,20 +181,24 @@ public class MapFragment extends Fragment {
         inflater.inflate(R.menu.map, menu);
         super.onCreateOptionsMenu(menu, inflater);
 
-        SearchView mapSearchView = (SearchView) menu.findItem(R.id.map_search).getActionView();
+        final SearchView mapSearchView = (SearchView) menu.findItem(R.id.map_search).getActionView();
         mapSearchView.setInputType(InputType.TYPE_CLASS_NUMBER);
         mapSearchView.setQueryHint(getString(R.string.search_zip));
         mapSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
-                getData(uri, "googleGeo", s);
+                if(!s.equals("")) {
+                    InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
+                    mapSearchView.clearFocus();
 
-                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(searchLatLng, 15), 500, null);
+                    getData(uri, "googleGeo", s);
 
-                InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
+                    return true;
+                } else {
+                    return false;
+                }
 
-                return true;
             }
             @Override
             public boolean onQueryTextChange(String s) {
@@ -220,7 +223,7 @@ public class MapFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         mMapView.onDestroy();
-        mProgressDialog.dismiss();
+        //mProgressDialog.dismiss();
     }
 
     @Override
@@ -267,7 +270,7 @@ public class MapFragment extends Fragment {
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
-                showProgressDialog();
+                ((MainActivity)getActivity()).showProgressDialog();
             }
             @Override
             protected String doInBackground(String... params) {
@@ -306,7 +309,7 @@ public class MapFragment extends Fragment {
 
             @Override
             protected void onPostExecute(String result) {
-                hideProgressDialog();
+                ((MainActivity)getActivity()).hideProgressDialog();
                 if (result != null) {
                     if(fn.equals("cafeL")) {
                         if (isAdded()) {
@@ -341,12 +344,16 @@ public class MapFragment extends Fragment {
                         }
                     } else if (fn.equals("googleGeo")){
                         try {
-                            JSONArray geoJson = new JSONObject(result).getJSONArray(TAG_RESULTS);
-                            JSONObject geo = geoJson.getJSONObject(0);
+                            JSONArray geoJson = new JSONObject(result).getJSONArray("results");
+                            JSONObject geo = geoJson.getJSONObject(0);Log.v("!!!", geo.getJSONObject("geometry").getJSONObject("location").getString("lat"));
                             double lat = Double.parseDouble(geo.getJSONObject("geometry").getJSONObject("location").getString("lat"));
                             double lng = Double.parseDouble(geo.getJSONObject("geometry").getJSONObject("location").getString("lng"));
 
-                            searchLatLng = new LatLng(lat, lng);
+                            LatLng searchLatLng = new LatLng(lat, lng);
+
+                            if (searchLatLng != null) {
+                                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(searchLatLng, 14), 500, null);
+                            }
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -394,19 +401,4 @@ public class MapFragment extends Fragment {
 
     }
 
-    private void showProgressDialog() {
-        if (mProgressDialog == null) {
-            mProgressDialog = new ProgressDialog(getActivity());
-            mProgressDialog.setMessage(getString(R.string.loading));
-            mProgressDialog.setIndeterminate(true);
-        }
-
-        mProgressDialog.show();
-    }
-
-    private void hideProgressDialog() {
-        if (mProgressDialog != null && mProgressDialog.isShowing()) {
-            mProgressDialog.hide();
-        }
-    }
 }

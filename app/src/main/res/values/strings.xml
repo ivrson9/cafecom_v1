@@ -13,7 +13,7 @@
 
     <!--<string name="url">http://192.168.100.7/cdol/kaffe/</string>-->
     <!--<string name="url">http://192.168.43.239/cdol/kaffe/</string>-->
-    <string name="url">http://93.202.233.68/cdol/kaffe/</string>
+    <string name="url">http://93.202.231.175/cdol/kaffe/</string>
 
     <!-- API Key -->
     <string name="google_maps_key">AIzaSyDOLnS0g9WrcodhykS2Fu8GldeKC0vqbDU</string>

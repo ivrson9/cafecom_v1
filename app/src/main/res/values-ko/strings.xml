@@ -1,25 +1,6 @@
 <resources>
     <string name="app_name">CaféCom</string>
 
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
-
-    <string name="detail_heading">Web Page Detail</string>
-    <string name="list_heading">Web Page Listing</string>
-
-    <!-- Tool bar -->
-    <string name="addCafeToolbar">Café 추가</string>
-    <string name="search_zip">우편번호 검색</string>
-
-    <!--<string name="url">http://192.168.100.7/cdol/kaffe/</string>-->
-    <!--<string name="url">http://192.168.43.239/cdol/kaffe/</string>-->
-    <string name="url">http://93.202.233.68/cdol/kaffe/</string>
-
-    <!-- API Key -->
-    <string name="google_maps_key">AIzaSyDOLnS0g9WrcodhykS2Fu8GldeKC0vqbDU</string>
-    <string name="facebook_app_id">1420996024637857</string>
-    <string name="banner_ad_unit_id">ca-app-pub-3679734076579105/5071958971</string>
-
     <!-- drawer Menu -->
     <string name="viewList">목록 보기</string>
     <string name="viewMap">지도로 보기</string>

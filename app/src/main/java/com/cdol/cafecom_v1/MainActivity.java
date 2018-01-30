@@ -79,6 +79,7 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void onUserDirectGrant(List<String> permissionList) {
                         for (String permission : permissionList) System.out.println("userGrant " + permission);
+                        MainActivity.super.onResume();
                     }
                 })
                 .setOnUserDirectPermissionDeny(new OnUserDirectPermissionDeny() {
@@ -113,125 +114,6 @@ public class MainActivity extends AppCompatActivity
                 .checkPermissions();
 
         loadActivity();
-    }
-
-    private void loadActivity(){
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//            }
-//        });
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-        View headerView = navigationView.getHeaderView(0);
-        Menu menu = navigationView.getMenu();
-
-        manager = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
-        networkInfo = manager.getActiveNetworkInfo();
-
-        // AdMob
-        AdView mAdView = (AdView) findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        mAdView.loadAd(adRequest);
-        MobileAds.initialize(getApplicationContext(), getString(R.string.banner_ad_unit_id));
-
-        // User Info
-        auto = getSharedPreferences("auto", Activity.MODE_PRIVATE);
-
-        LinearLayout infoLayout = (LinearLayout) headerView.findViewById(R.id.userInfoLayout);
-        LinearLayout loginLayout = (LinearLayout) headerView.findViewById(R.id.loginLayout);
-        TextView userEmail = (TextView) headerView.findViewById(R.id.userEmail);
-        TextView userName = (TextView) headerView.findViewById(R.id.userName);
-        ImageView userPhoto = (ImageView) headerView.findViewById(R.id.userImage);
-        Button loginBtn = (Button) headerView.findViewById(R.id.loginBtn);
-
-        user = new User();
-        user.setEmail(auto.getString("inputEmail", ""));
-        user.setName(auto.getString("inputName", ""));
-        user.setPhoto(auto.getString("inputPhoto", ""));
-        MenuItem logout = menu.findItem(R.id.nav_logOut);
-
-        if(user.getEmail() == ""){
-            infoLayout.setVisibility(View.GONE);
-            loginLayout.setVisibility(View.VISIBLE);
-
-            loginBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    loginActivity();
-                }
-            });
-            logout.setVisible(false);
-        } else {
-            infoLayout.setVisibility(View.VISIBLE);
-            loginLayout.setVisibility(View.GONE);
-            logout.setVisible(true);
-        }
-        userEmail.setText(user.getEmail());
-        userName.setText(user.getName());
-        Glide.with(this).load(user.getPhoto())
-                .bitmapTransform(new CropCircleTransformation(this))
-                .into(userPhoto);
-
-        myLocation = new MyLocation();
-
-        mainFragment("");
-    }
-
-    public void loginActivity(){
-        Intent intent = new Intent(getBaseContext(), LoginActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        startActivityForResult(intent, 0);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data){
-        // commentWriteActivity 종료
-        if(requestCode == 1){
-            Fragment frg = fragmentManager.findFragmentByTag("CafeViewFragment");
-            FragmentTransaction ft = fragmentManager.beginTransaction();
-            ft.detach(frg);
-            ft.attach(frg);
-            ft.commit();
-        } else {
-            for (int i = 0; i < fragmentManager.getBackStackEntryCount(); ++i) {
-                fragmentManager.popBackStack();
-            }
-            loadActivity();
-        }
-    }
-
-    public void mainFragment(String search){
-        fragmentManager = getFragmentManager();
-        FragmentTransaction ft = fragmentManager.beginTransaction();
-
-        LocationManager locManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-
-        if(myLocation.isAvailable(this) && networkInfo != null && networkInfo.isConnected()){
-            myLocation.searchAddress(this);
-            cafeListFragment = new CafeListFragment(myLocation, search);
-            ft.add(R.id.mainFragment, cafeListFragment, "MainFragment");
-        } else {
-            NoneFragment noneFragment = new NoneFragment();
-            ft.add(R.id.mainFragment, noneFragment, "NoneFragment");
-        }
-
-        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-        ft.addToBackStack(null);
-        ft.commit();
     }
 
     @Override
@@ -391,6 +273,144 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    public void onDestroy(){
+        if (mProgressDialog != null) {
+            mProgressDialog.dismiss();
+        }
+        super.onDestroy();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT && fragmentManager.getBackStackEntryCount() == 1) {
+            while (fragmentManager.getBackStackEntryCount() > 0) {
+                fragmentManager.popBackStackImmediate();
+            }
+            loadActivity();
+        }
+    }
+
+    private void loadActivity(){
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+//        fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
+//            }
+//        });
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+        View headerView = navigationView.getHeaderView(0);
+        Menu menu = navigationView.getMenu();
+
+        manager = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
+        networkInfo = manager.getActiveNetworkInfo();
+
+        // AdMob
+        AdView mAdView = (AdView) findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
+        MobileAds.initialize(getApplicationContext(), getString(R.string.banner_ad_unit_id));
+
+        // User Info
+        auto = getSharedPreferences("auto", Activity.MODE_PRIVATE);
+
+        LinearLayout infoLayout = (LinearLayout) headerView.findViewById(R.id.userInfoLayout);
+        LinearLayout loginLayout = (LinearLayout) headerView.findViewById(R.id.loginLayout);
+        TextView userEmail = (TextView) headerView.findViewById(R.id.userEmail);
+        TextView userName = (TextView) headerView.findViewById(R.id.userName);
+        ImageView userPhoto = (ImageView) headerView.findViewById(R.id.userImage);
+        Button loginBtn = (Button) headerView.findViewById(R.id.loginBtn);
+
+        user = new User();
+        user.setEmail(auto.getString("inputEmail", ""));
+        user.setName(auto.getString("inputName", ""));
+        user.setPhoto(auto.getString("inputPhoto", ""));
+        MenuItem logout = menu.findItem(R.id.nav_logOut);
+
+        if(user.getEmail() == ""){
+            infoLayout.setVisibility(View.GONE);
+            loginLayout.setVisibility(View.VISIBLE);
+
+            loginBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    loginActivity();
+                }
+            });
+            logout.setVisible(false);
+        } else {
+            infoLayout.setVisibility(View.VISIBLE);
+            loginLayout.setVisibility(View.GONE);
+            logout.setVisible(true);
+        }
+        userEmail.setText(user.getEmail());
+        userName.setText(user.getName());
+        Glide.with(this).load(user.getPhoto())
+                .bitmapTransform(new CropCircleTransformation(this))
+                .into(userPhoto);
+
+        myLocation = new MyLocation();
+
+        mainFragment("");
+    }
+
+    public void loginActivity(){
+        Intent intent = new Intent(getBaseContext(), LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivityForResult(intent, 0);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        // commentWriteActivity 종료
+        if(requestCode == 1){
+            Fragment frg = fragmentManager.findFragmentByTag("CafeViewFragment");
+            FragmentTransaction ft = fragmentManager.beginTransaction();
+            ft.detach(frg);
+            ft.attach(frg);
+            ft.commit();
+        } else {
+            for (int i = 0; i < fragmentManager.getBackStackEntryCount(); ++i) {
+                fragmentManager.popBackStack();
+            }
+            loadActivity();
+        }
+    }
+
+    public void mainFragment(String search){
+        fragmentManager = getFragmentManager();
+        FragmentTransaction ft = fragmentManager.beginTransaction();
+
+        LocationManager locManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+
+        if(myLocation.isAvailable(this) && networkInfo != null && networkInfo.isConnected()){
+            myLocation.searchAddress(this);
+            cafeListFragment = new CafeListFragment(myLocation, search);
+            ft.add(R.id.mainFragment, cafeListFragment, "MainFragment");
+        } else {
+            NoneFragment noneFragment = new NoneFragment();
+            ft.add(R.id.mainFragment, noneFragment, "NoneFragment");
+        }
+
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+        ft.addToBackStack(null);
+        ft.commit();
+    }
+
+    @Override
     public void onItemSelected(Cafe c, int fn) {
         Log.v("AndroidFragmentActivity", Integer.toString(c.getNo()));
         FragmentTransaction ft = fragmentManager.beginTransaction();
@@ -466,20 +486,7 @@ public class MainActivity extends AppCompatActivity
 
     public void hideProgressDialog() {
         if (mProgressDialog != null && mProgressDialog.isShowing()) {
-            mProgressDialog.hide();
-        }
-    }
-
-    @Override
-    public void onDestroy(){
-        if (mProgressDialog != null) {
             mProgressDialog.dismiss();
         }
-        super.onDestroy();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
     }
 }

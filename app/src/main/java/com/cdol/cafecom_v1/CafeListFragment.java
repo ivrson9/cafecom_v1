@@ -242,7 +242,7 @@ public class CafeListFragment extends Fragment {
 
             @Override
             protected void onPostExecute(String result) {
-                ((MainActivity)getActivity()).hideProgressDialog();
+                //((MainActivity)getActivity()).hideProgressDialog();
                 if(isAdded()) {
                     try {
                         JSONArray cafeJson = new JSONObject(result).getJSONArray(TAG_RESULTS);
